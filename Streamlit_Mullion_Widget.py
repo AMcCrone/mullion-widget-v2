@@ -353,7 +353,7 @@ st.markdown("For the point load $P_{BL}$ at barrier height $L_{BL}$, the deflect
 st.latex(r'''
     \delta_{BL}=\frac{P_{BL}}{12EI}*\left(L^2-x^2-L_{BL}^2\right)
     ''')
-st.markdown("Where $L_{BL}$ has been assumed to be 1100mm from the base of the mullion and the deflection taken at midspan ($x = \frac{L}{2}$) for superposition with $\delta_{WL}$. Thus:")
+st.markdown("Where $L_{BL}$ has been assumed to be 1100mm from the base of the mullion and the deflection taken at midspan ($x = L/2$) for superposition with $\delta_{WL}$. Thus:")
 st.latex(r'''
     \delta_{BL}=\frac{P_{BL}}{12EI}*\left(\frac{3}{4}L^2-L_{BL}^2\right)
     ''')
