@@ -260,7 +260,7 @@ def generate_plots():
         marker=dict(
             size=sizes,
             color=depths_3d,
-            colorscale='Oryel',
+            colorscale='Emrld',
             colorbar=dict(title="Depth (mm)")
         ),
         text=[f"{safe_suppliers[i]}: {safe_profiles[i]}<br>Depth: {depths_3d[i]} mm<br>"
@@ -305,4 +305,4 @@ with col2:
 with col3:
     st.plotly_chart(util_fig, height=650, use_container_width=True)
     pdf_util = get_pdf_bytes(util_fig)
-    st.download_button("Download 3D PDF", data=pdf_util, file_name="3D_Utilisation.pdf", mime="application/pdf")
+    st.download_button("Download Utilisation PDF", data=pdf_util, file_name="3D_Utilisation.pdf", mime="application/pdf")
