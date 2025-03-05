@@ -259,6 +259,7 @@ def generate_plots():
         mode='markers',
         marker=dict(
             size=sizes,
+            symbol=[ 'square' if reinf[i] else 'circle' for i in valid],
             color=depths_3d,
             colorscale='Emrld',
             colorbar=dict(title="Depth (mm)")
