@@ -292,15 +292,15 @@ uls_fig, sls_fig, util_fig = generate_plots()
 # ---------------------------
 col1, col2, col3 = st.columns([1, 1, 1.5])
 with col1:
-    st.plotly_chart(uls_fig, height=500, use_container_width=True)
+    st.plotly_chart(uls_fig, height=1000, use_container_width=True)
     pdf_uls = get_pdf_bytes(uls_fig)
     st.download_button("Download ULS PDF", data=pdf_uls, file_name="ULS_Design.pdf", mime="application/pdf")
 with col2:
-    st.plotly_chart(sls_fig, height=500, use_container_width=True)
+    st.plotly_chart(sls_fig, height=1000, use_container_width=True)
     pdf_sls = get_pdf_bytes(sls_fig)
     st.download_button("Download SLS PDF", data=pdf_sls, file_name="SLS_Design.pdf", mime="application/pdf")
 with col3:
-    st.plotly_chart(util_fig, height=500, use_container_width=True)
+    st.plotly_chart(util_fig, height=1000, use_container_width=True)
     pdf_util = get_pdf_bytes(util_fig)
     st.download_button("Download 3D PDF", data=pdf_util, file_name="3D_Utilisation.pdf", mime="application/pdf")
 
