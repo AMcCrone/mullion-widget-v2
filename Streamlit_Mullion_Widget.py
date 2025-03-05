@@ -335,7 +335,15 @@ df_mat["Max Utilisation"] = df_mat[["ULS Utilisation", "SLS Utilisation"]].max(a
 # Sort profiles so that the best-performing (lowest utilisation) are at the top.
 df_sorted = df_mat.sort_values(by="Max Utilisation", ascending=True)
 
-# Create the Plotly Table without conditional colors.
+row_colors = []
+for _, row in df_sorted.iterrows():
+    # If both utilisation checks pass (<= 1), mark as blue; otherwise, grey.
+    if (row["ULS Utilisation"] <= 1) and (row["SLS Utilisation"] <= 1):
+        row_colors.append("#88DBDF")  # blue for passing sections
+    else:
+        row_colors.append("#DFE0E1")  # grey for failing sections
+
+# Create the Plotly Table.
 table_fig = go.Figure(data=[go.Table(
     header=dict(
         values=["Supplier", "Profile Name", "Depth (mm)", "Section Modulus (cm³)", "Second Moment of Area (cm⁴)", "ULS Utilisation", "SLS Utilisation"],
@@ -348,12 +356,12 @@ table_fig = go.Figure(data=[go.Table(
             df_sorted["Supplier"],
             df_sorted["Profile Name"],
             df_sorted["Depth"],
-            (df_sorted["Wyy"] / 1000).round(2),      # Convert mm³ to cm³
-            (df_sorted["Iyy"] / 10000).round(2),       # Convert mm⁴ to cm⁴
+            (df_sorted["Wyy"] / 1000).round(2),
+            (df_sorted["Iyy"] / 10000).round(2),
             df_sorted["ULS Utilisation"].round(2),
             df_sorted["SLS Utilisation"].round(2)
         ],
-        fill_color="white",  # Uniform white background for cells
+        fill_color=[row_colors] * 7,  # assign the computed row colors to all columns
         align="center"
     )
 )])
