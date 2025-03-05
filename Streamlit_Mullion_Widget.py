@@ -280,9 +280,15 @@ def generate_plots():
     if view_3d_option == "Isometric: Overview":
         camera = dict(eye=dict(x=1.25, y=1.25, z=1.25))
     elif view_3d_option == "XY Plane: Utilisation":
-        camera = dict(eye=dict(x=0, y=0, z=2.5))
+        camera = dict(
+            eye=dict(x=0, y=0, z=2.5),
+            projection=dict(type='orthographic')
+        )
     elif view_3d_option == "XZ Plane: Section Depth":
-        camera = dict(eye=dict(x=1.25, y=0, z=1.25))
+        camera = dict(
+            eye=dict(x=1.25, y=0, z=1.25),
+            projection=dict(type='orthographic')
+        )
     util_fig.update_layout(scene_camera=camera)
 
     return uls_fig, sls_fig, util_fig
