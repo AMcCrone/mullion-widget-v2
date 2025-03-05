@@ -223,9 +223,9 @@ def generate_plots():
             safe_profiles.append(profiles[i])
     if len(uls_util) > 0:
         d_arr = np.sqrt(np.array(uls_util)**2 + np.array(sls_util)**2)
-        sizes = 1 + (d_arr / np.sqrt(2)) * 9
+        sizes = 3 + (d_arr / np.sqrt(2)) * 27
     else:
-        sizes = 10
+        sizes = 30
 
     recommended_text = "No suitable profile - choose a custom one!"
     if len(depths_3d) > 0:
