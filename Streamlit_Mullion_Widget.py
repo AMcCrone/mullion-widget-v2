@@ -266,6 +266,10 @@ def generate_plots():
             yaxis_title="SLS Utilisation",
             zaxis_title="Section Depth (mm)"
         )
+        scene=dict(
+            xaxis=dict(range=[0.0, 1.0]),
+            yaxis=dict(range=[0.0, 1.0])
+    )
     )
     if view_3d_option == "Isometric: Overview":
         camera = dict(eye=dict(x=1.25, y=1.25, z=1.25))
