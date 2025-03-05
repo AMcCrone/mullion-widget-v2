@@ -306,31 +306,63 @@ with col3:
     pdf_util = get_pdf_bytes(util_fig)
     st.download_button("Download Utilisation PDF", data=pdf_util, file_name="3D_Utilisation.pdf", mime="application/pdf")
 
-# ---------------------------
-# Generate and Display Data Table
-# ---------------------------
+# -----------------------------------------------------------------------------
+# Append Table of Profiles Sorted by Utilisation with Conditional Coloring
+# -----------------------------------------------------------------------------
 
-# Calculate utilisation ratios
+# Compute utilisation ratios for each profile in df_mat.
+# ULS utilisation = Required Z / Available Z (in cm³)
+df_mat = df_selected[(df_selected["Material"] == plot_material) & 
+                     (df_selected["Supplier"].isin(selected_suppliers))].copy()
+df_mat.reset_index(drop=True, inplace=True)
+
+# Calculate ULS utilisation based on the available section modulus (converted to cm³)
 df_mat["ULS Utilisation"] = Z_req_cm3 / (df_mat["Wyy"] / 1000)
-df_mat["SLS Utilisation"] = np.array(defl_values) / defl_limit
 
-# Sort by max utilisation
+# Recompute deflection for each row (similar to the calculation in generate_plots)
+E = material_props[plot_material]["E"]
+defl_values_table = []
+for i, row in df_mat.iterrows():
+    Iyy_val = row["Iyy"]
+    d_wl = (5 * wind_pressure * 0.001 * bay_width * mullion_length**4) / (384 * E * Iyy_val)
+    F_BL = selected_barrier_load * bay_width
+    d_bl = ((F_BL * barrier_L) / (12 * E * Iyy_val)) * (0.75 * mullion_length**2 - barrier_L**2)
+    defl_total = d_wl if SLS_case.startswith("SLS 1") else d_bl
+    defl_values_table.append(defl_total)
+df_mat["SLS Utilisation"] = np.array(defl_values_table) / defl_limit
+
+# For sorting, we determine a 'Max Utilisation' (the higher of the two ratios)
 df_mat["Max Utilisation"] = df_mat[["ULS Utilisation", "SLS Utilisation"]].max(axis=1)
-df_sorted = df_mat.sort_values(by="Max Utilisation", ascending=False)
+# Sorting in ascending order so that profiles with lower (better) utilisation appear first.
+df_sorted = df_mat.sort_values(by="Max Utilisation", ascending=True)
 
-# Define colors based on utilisation check
-def get_row_color(uls, sls):
-    if uls <= 1 and sls <= 1:
-        return "rgba(46, 204, 113, 0.8)"  # 'Emrld' color scale (greenish)
-    return "rgba(160, 160, 160, 0.6)"  # Grey out failed rows
+# Create a helper function to pick a color from the Emrld colorscale based on depth.
+def get_emrld_color(depth, min_depth, max_depth):
+    scale = px.colors.sequential.Emrld
+    if max_depth == min_depth:
+        return scale[len(scale)//2]
+    norm = (depth - min_depth) / (max_depth - min_depth)
+    idx = int(norm * (len(scale)-1))
+    return scale[idx]
 
-row_colors = [get_row_color(uls, sls) for uls, sls in zip(df_sorted["ULS Utilisation"], df_sorted["SLS Utilisation"])]
+# Compute the min and max depths from the sorted dataframe
+min_depth_val = df_sorted["Depth"].min()
+max_depth_val = df_sorted["Depth"].max()
 
-# Create Plotly DataTable
+# Determine row colors: if both utilisation checks pass then use a color from Emrld based on depth; otherwise grey.
+row_colors = []
+for _, row in df_sorted.iterrows():
+    passes = (row["ULS Utilisation"] <= 1) and (row["SLS Utilisation"] <= 1)
+    if passes:
+        row_colors.append(get_emrld_color(row["Depth"], min_depth_val, max_depth_val))
+    else:
+        row_colors.append("lightgrey")
+
+# Create the Plotly Table
 table_fig = go.Figure(data=[go.Table(
     header=dict(
         values=["Supplier", "Profile Name", "Depth (mm)", "Section Modulus (cm³)", "Second Moment of Area (cm⁴)", "ULS Utilisation", "SLS Utilisation"],
-        fill_color="rgb(0,48,60)",  # Dark Blue header
+        fill_color=TT_DarkBlue,
         font=dict(color="white", size=14),
         align="center"
     ),
@@ -339,17 +371,18 @@ table_fig = go.Figure(data=[go.Table(
             df_sorted["Supplier"],
             df_sorted["Profile Name"],
             df_sorted["Depth"],
-            df_sorted["Wyy"] / 1000,  # Convert mm³ to cm³
-            df_sorted["Iyy"] / 10**4,  # Convert mm⁴ to cm⁴
+            (df_sorted["Wyy"] / 1000).round(2),      # Convert mm³ to cm³
+            (df_sorted["Iyy"] / 10000).round(2),       # Convert mm⁴ to cm⁴
             df_sorted["ULS Utilisation"].round(2),
-            df_sorted["SLS Utilisation"].round(2),
+            df_sorted["SLS Utilisation"].round(2)
         ],
-        fill_color=[row_colors] * 7,  # Apply row-based coloring
+        # Apply the same row color for every column
+        fill_color=[row_colors] * 7,
         align="center"
     )
 )])
 
-# Display Table
+# Display the table below the graphs.
 st.plotly_chart(table_fig, use_container_width=True)
 
 
