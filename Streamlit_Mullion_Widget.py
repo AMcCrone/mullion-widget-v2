@@ -3,14 +3,8 @@ import os
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
-
-# Define a few key colours.
-TT_Orange = "rgb(211,69,29)"
-TT_Olive = "rgb(139,144,100)"
-TT_LightBlue = "rgb(136,219,223)"
-TT_MidBlue = "rgb(0,163,173)"
-TT_DarkBlue = "rgb(0,48,60)"
-TT_Grey = "rgb(99,102,105)"
+import io
+from PyPDF2 import PdfMerger  # for merging PDFs
 
 # ---------------------------
 # Streamlit Page Setup
@@ -22,7 +16,6 @@ st.title("Mullion Design Widget")
 # Sidebar Controls
 # ---------------------------
 st.sidebar.header("Settings")
-
 plot_material = st.sidebar.selectbox("Select Material", options=["Steel", "Aluminium"], index=0)
 
 # Read the Excel file (stored in the repository) using a relative path.
@@ -44,7 +37,6 @@ material_props = {
     "Steel": {"fy": 355, "E": 210000}
 }
 
-# Additional sidebar inputs
 suppliers_all = sorted(df_selected["Supplier"].unique())
 selected_suppliers = st.sidebar.multiselect("Select Suppliers", options=suppliers_all, default=suppliers_all)
 show_data_labels = st.sidebar.checkbox("Show Data Labels", value=False)
@@ -65,14 +57,33 @@ view_3d_option = st.sidebar.radio("3D View", options=[
 wind_pressure = st.sidebar.slider("Wind Pressure (kPa)", 0.1, 5.0, 1.0, 0.1)
 bay_width = st.sidebar.slider("Bay Width (mm)", 2000, 10000, 3000, 500)
 mullion_length = st.sidebar.slider("Mullion Length (mm)", 2500, 12000, 4000, 250)
-barrier_L = 1100  # constant barrier length in mm
+barrier_L = 1100  # constant barrier length (mm)
+
+# ---------------------------
+# Helper Functions for PDF Export
+# ---------------------------
+def get_pdf_bytes(fig):
+    buffer = io.BytesIO()
+    fig.write_image(buffer, format="pdf")
+    buffer.seek(0)
+    return buffer.getvalue()
+
+def merge_pdfs(pdf_bytes_list):
+    merger = PdfMerger()
+    for pdf_bytes in pdf_bytes_list:
+        merger.append(io.BytesIO(pdf_bytes))
+    out_buffer = io.BytesIO()
+    merger.write(out_buffer)
+    merger.close()
+    out_buffer.seek(0)
+    return out_buffer.getvalue()
 
 # ---------------------------
 # Generate Plotly Figures
 # ---------------------------
 def generate_plots():
-    # Calculate basic forces and moments.
-    p = wind_pressure * 0.001  # Convert kPa to N/mm²
+    # Basic calculations
+    p = wind_pressure * 0.001  # kPa to N/mm²
     bay = bay_width
     L = mullion_length
     w = p * bay
@@ -91,10 +102,9 @@ def generate_plots():
         M_ULS = 0
 
     fy = material_props[plot_material]["fy"]
-    Z_req = M_ULS / fy          # Required section modulus (mm³)
-    Z_req_cm3 = Z_req / 1000     # in cm³
+    Z_req = M_ULS / fy          # mm³
+    Z_req_cm3 = Z_req / 1000     # cm³
 
-    # Deflection limit.
     if L <= 3000:
         defl_limit = L / 200
     elif L < 7500:
@@ -102,7 +112,6 @@ def generate_plots():
     else:
         defl_limit = L / 250
 
-    # Filter data for the chosen material and suppliers.
     df_mat = df_selected[(df_selected["Material"] == plot_material) & 
                          (df_selected["Supplier"].isin(selected_suppliers))]
     if df_mat.empty:
@@ -130,7 +139,6 @@ def generate_plots():
     uls_ymax = 4 * Z_req_cm3
 
     uls_fig = go.Figure()
-    # Add background shading.
     uls_fig.add_shape(type="rect",
                       x0=x_min, x1=x_max,
                       y0=Z_req_cm3, y1=uls_ymax,
@@ -172,8 +180,6 @@ def generate_plots():
             f"SLS: {'Pass' if defl_total <= defl_limit else 'Fail'}"
         )
     sls_ymax = 1.33 * defl_limit
-
-    # Only show SLS results for sections that passed ULS.
     valid = np.where(uls_passed)[0]
     sls_fig = go.Figure()
     sls_fig.add_shape(type="rect",
@@ -223,9 +229,9 @@ def generate_plots():
             safe_profiles.append(profiles[i])
     if len(uls_util) > 0:
         d_arr = np.sqrt(np.array(uls_util)**2 + np.array(sls_util)**2)
-        sizes = 3 + (d_arr / np.sqrt(2)) * 27
+        sizes = 20 + (d_arr / np.sqrt(2)) * 480
     else:
-        sizes = 30
+        sizes = 500
 
     recommended_text = "No suitable profile - choose a custom one!"
     if len(depths_3d) > 0:
@@ -260,7 +266,6 @@ def generate_plots():
             zaxis_title="Section Depth (mm)"
         )
     )
-    # Set the 3D camera based on view option.
     if view_3d_option == "Isometric: Overview":
         camera = dict(eye=dict(x=1.25, y=1.25, z=1.25))
     elif view_3d_option == "XY Plane: Utilisation":
@@ -274,10 +279,23 @@ def generate_plots():
 # Generate the Plotly figures.
 uls_fig, sls_fig, util_fig = generate_plots()
 
-# Display the figures in Streamlit.
-col1, col2 = st.columns(2)
+# ---------------------------
+# Layout: Arrange all three graphs on one line.
+# ---------------------------
+col1, col2, col3 = st.columns(3)
 with col1:
     st.plotly_chart(uls_fig, use_container_width=True)
+    pdf_uls = get_pdf_bytes(uls_fig)
+    st.download_button("Download ULS PDF", data=pdf_uls, file_name="ULS_Design.pdf", mime="application/pdf")
 with col2:
     st.plotly_chart(sls_fig, use_container_width=True)
-st.plotly_chart(util_fig, use_container_width=True)
+    pdf_sls = get_pdf_bytes(sls_fig)
+    st.download_button("Download SLS PDF", data=pdf_sls, file_name="SLS_Design.pdf", mime="application/pdf")
+with col3:
+    st.plotly_chart(util_fig, use_container_width=True)
+    pdf_util = get_pdf_bytes(util_fig)
+    st.download_button("Download 3D PDF", data=pdf_util, file_name="3D_Utilisation.pdf", mime="application/pdf")
+
+# Optional: Merge all PDFs into one dashboard PDF.
+all_pdf_bytes = merge_pdfs([pdf_uls, pdf_sls, pdf_util])
+st.download_button("Download Full Dashboard PDF", data=all_pdf_bytes, file_name="Dashboard.pdf", mime="application/pdf")
