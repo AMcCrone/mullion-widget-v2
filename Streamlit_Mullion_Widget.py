@@ -290,7 +290,7 @@ uls_fig, sls_fig, util_fig = generate_plots()
 # ---------------------------
 # Layout: Arrange all three graphs on one line.
 # ---------------------------
-col1, col2, col3 = st.columns(3)
+col1, col2, col3 = st.columns([1, 1, 1.5])
 with col1:
     st.plotly_chart(uls_fig, height=500, use_container_width=True)
     pdf_uls = get_pdf_bytes(uls_fig)
