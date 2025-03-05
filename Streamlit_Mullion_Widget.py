@@ -24,7 +24,7 @@ st.title("Mullion Design Widget")
 # Sidebar Controls
 # ---------------------------
 st.sidebar.header("Settings")
-plot_material = st.sidebar.selectbox("Select Material", options=["Steel", "Aluminium"], index=0)
+plot_material = st.sidebar.selectbox("Select Material", options=["Aluminium", "Steel"], index=0)
 
 # Read the Excel file (stored in the repository) using a relative path.
 BASE_DIR = os.path.dirname(__file__)
