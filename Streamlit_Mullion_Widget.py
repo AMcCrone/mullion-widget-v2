@@ -367,8 +367,8 @@ table_fig = go.Figure(data=[go.Table(
             df_sorted["Depth"],
             (df_sorted["Wyy"] / 1000).round(2),
             (df_sorted["Iyy"] / 10000).round(2),
-            df_sorted["ULS Utilisation"] = df_sorted["ULS Utilisation"].mul(100).round(1).astype(str) + "%"
-            df_sorted["SLS Utilisation"] = df_sorted["SLS Utilisation"].mul(100).round(1).astype(str) + "%"
+            df_sorted["ULS Utilisation"] == df_sorted["ULS Utilisation"].mul(100).round(1).astype(str) + "%"
+            df_sorted["SLS Utilisation"] == df_sorted["SLS Utilisation"].mul(100).round(1).astype(str) + "%"
         ],
         fill_color=[row_colors] * 7,  # assign the computed row colors to all columns
         font=dict(color=[text_colors] * 7, size=14), 
