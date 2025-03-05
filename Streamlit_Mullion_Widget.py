@@ -307,11 +307,10 @@ with col3:
     st.download_button("Download Utilisation PDF", data=pdf_util, file_name="3D_Utilisation.pdf", mime="application/pdf")
 
 # -----------------------------------------------------------------------------
-# Append Table of Profiles Sorted by Utilisation with Conditional Coloring
+# Append Table of Profiles Sorted by Utilisation (No Conditional Colors)
 # -----------------------------------------------------------------------------
 
 # Compute utilisation ratios for each profile in df_mat.
-# ULS utilisation = Required Z / Available Z (in cm³)
 df_mat = df_selected[(df_selected["Material"] == plot_material) & 
                      (df_selected["Supplier"].isin(selected_suppliers))].copy()
 df_mat.reset_index(drop=True, inplace=True)
@@ -319,7 +318,7 @@ df_mat.reset_index(drop=True, inplace=True)
 # Calculate ULS utilisation based on the available section modulus (converted to cm³)
 df_mat["ULS Utilisation"] = Z_req_cm3 / (df_mat["Wyy"] / 1000)
 
-# Recompute deflection for each row (similar to the calculation in generate_plots)
+# Recompute deflection for each row (using the same approach as in generate_plots)
 E = material_props[plot_material]["E"]
 defl_values_table = []
 for i, row in df_mat.iterrows():
@@ -331,38 +330,12 @@ for i, row in df_mat.iterrows():
     defl_values_table.append(defl_total)
 df_mat["SLS Utilisation"] = np.array(defl_values_table) / defl_limit
 
-# For sorting, we determine a 'Max Utilisation' (the higher of the two ratios)
+# Create a 'Max Utilisation' for sorting purposes
 df_mat["Max Utilisation"] = df_mat[["ULS Utilisation", "SLS Utilisation"]].max(axis=1)
-# Sorting in ascending order so that profiles with lower (better) utilisation appear first.
+# Sort profiles so that the best-performing (lowest utilisation) are at the top.
 df_sorted = df_mat.sort_values(by="Max Utilisation", ascending=True)
 
-# Create a helper function to pick a color from the Emrld colorscale based on depth.
-def get_emrld_color(depth, min_depth, max_depth):
-    try:
-        scale = px.colors.sequential.Emrld
-    except AttributeError:
-        # Fallback colorscale (a green palette)
-        scale = ['#006400', '#228B22', '#32CD32', '#7CFC00', '#ADFF2F']
-    if max_depth == min_depth:
-        return scale[len(scale)//2]
-    norm = (depth - min_depth) / (max_depth - min_depth)
-    idx = int(norm * (len(scale)-1))
-    return scale[idx]
-
-# Compute the min and max depths from the sorted dataframe
-min_depth_val = df_sorted["Depth"].min()
-max_depth_val = df_sorted["Depth"].max()
-
-# Determine row colors: if both utilisation checks pass then use a color from Emrld based on depth; otherwise grey.
-row_colors = []
-for _, row in df_sorted.iterrows():
-    passes = (row["ULS Utilisation"] <= 1) and (row["SLS Utilisation"] <= 1)
-    if passes:
-        row_colors.append(get_emrld_color(row["Depth"], min_depth_val, max_depth_val))
-    else:
-        row_colors.append("lightgrey")
-
-# Create the Plotly Table
+# Create the Plotly Table without conditional colors.
 table_fig = go.Figure(data=[go.Table(
     header=dict(
         values=["Supplier", "Profile Name", "Depth (mm)", "Section Modulus (cm³)", "Second Moment of Area (cm⁴)", "ULS Utilisation", "SLS Utilisation"],
@@ -380,13 +353,11 @@ table_fig = go.Figure(data=[go.Table(
             df_sorted["ULS Utilisation"].round(2),
             df_sorted["SLS Utilisation"].round(2)
         ],
-        # Apply the same row color for every column
-        fill_color=[row_colors] * 7,
+        fill_color="white",  # Uniform white background for cells
         align="center"
     )
 )])
 
-# Display the table below the graphs.
 st.plotly_chart(table_fig, use_container_width=True)
 
 
