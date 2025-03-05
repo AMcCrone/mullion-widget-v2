@@ -237,9 +237,9 @@ def generate_plots():
             safe_profiles.append(profiles[i])
     if len(uls_util) > 0:
         d_arr = np.sqrt(np.array(uls_util)**2 + np.array(sls_util)**2)
-        sizes = 20 + (d_arr / np.sqrt(2)) * 480
+        sizes = 3 + (d_arr / np.sqrt(2)) * 27
     else:
-        sizes = 500
+        sizes = 30
 
     recommended_text = "No suitable profile - choose a custom one!"
     if len(depths_3d) > 0:
@@ -292,15 +292,15 @@ uls_fig, sls_fig, util_fig = generate_plots()
 # ---------------------------
 col1, col2, col3 = st.columns(3)
 with col1:
-    st.plotly_chart(uls_fig, use_container_width=True)
+    st.plotly_chart(uls_fig, height=500, use_container_width=True)
     pdf_uls = get_pdf_bytes(uls_fig)
     st.download_button("Download ULS PDF", data=pdf_uls, file_name="ULS_Design.pdf", mime="application/pdf")
 with col2:
-    st.plotly_chart(sls_fig, use_container_width=True)
+    st.plotly_chart(sls_fig, height=500, use_container_width=True)
     pdf_sls = get_pdf_bytes(sls_fig)
     st.download_button("Download SLS PDF", data=pdf_sls, file_name="SLS_Design.pdf", mime="application/pdf")
 with col3:
-    st.plotly_chart(util_fig, use_container_width=True)
+    st.plotly_chart(util_fig, height=500, use_container_width=True)
     pdf_util = get_pdf_bytes(util_fig)
     st.download_button("Download 3D PDF", data=pdf_util, file_name="3D_Utilisation.pdf", mime="application/pdf")
 
