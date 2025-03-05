@@ -170,7 +170,7 @@ def generate_plots():
         yaxis_title="Section Modulus (cm³)",
         xaxis=dict(range=[x_min, x_max]),
         yaxis=dict(range=[0, uls_ymax]),
-        height=500
+        height=1000
     )
 
 
@@ -220,7 +220,7 @@ def generate_plots():
         yaxis_title="Deflection (mm)",
         xaxis=dict(range=[x_min, x_max]),
         yaxis=dict(range=[0, sls_ymax]),
-        height=500
+        height=1000
     )
 
     # ----- 3D Utilisation Plot -----
