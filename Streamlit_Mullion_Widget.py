@@ -6,6 +6,14 @@ import plotly.graph_objects as go
 import io
 from PyPDF2 import PdfMerger  # for merging PDFs
 
+# Define a TT colours.
+TT_Orange = "rgb(211,69,29)"
+TT_Olive = "rgb(139,144,100)"
+TT_LightBlue = "rgb(136,219,223)"
+TT_MidBlue = "rgb(0,163,173)"
+TT_DarkBlue = "rgb(0,48,60)"
+TT_Grey = "rgb(99,102,105)"
+
 # ---------------------------
 # Streamlit Page Setup
 # ---------------------------
