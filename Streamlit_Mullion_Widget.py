@@ -75,16 +75,6 @@ def get_pdf_bytes(fig):
     buffer.seek(0)
     return buffer.getvalue()
 
-def merge_pdfs(pdf_bytes_list):
-    merger = PdfMerger()
-    for pdf_bytes in pdf_bytes_list:
-        merger.append(io.BytesIO(pdf_bytes))
-    out_buffer = io.BytesIO()
-    merger.write(out_buffer)
-    merger.close()
-    out_buffer.seek(0)
-    return out_buffer.getvalue()
-
 # ---------------------------
 # Generate Plotly Figures
 # ---------------------------
@@ -259,7 +249,6 @@ def generate_plots():
         mode='markers',
         marker=dict(
             size=sizes,
-            symbol=[ 'square' if reinf[i] else 'circle' for i in valid],
             color=depths_3d,
             colorscale='Emrld',
             colorbar=dict(title="Depth (mm)")
