@@ -348,7 +348,7 @@ table_fig = go.Figure(data=[go.Table(
     header=dict(
         values=["Supplier", "Profile Name", "Depth (mm)", "Section Modulus (cm³)", "Second Moment of Area (cm⁴)", "ULS Utilisation", "SLS Utilisation"],
         fill_color=TT_DarkBlue,
-        font=dict(color="white", size=14),
+        font=dict(color="white", size=24),
         align="center"
     ),
     cells=dict(
@@ -362,6 +362,7 @@ table_fig = go.Figure(data=[go.Table(
             df_sorted["SLS Utilisation"].round(2)
         ],
         fill_color=[row_colors] * 7,  # assign the computed row colors to all columns
+        font=dict(size=14), 
         align="center"
     )
 )])
