@@ -305,3 +305,16 @@ with col3:
     st.plotly_chart(util_fig, height=650, use_container_width=True)
     pdf_util = get_pdf_bytes(util_fig)
     st.download_button("Download Utilisation PDF", data=pdf_util, file_name="3D_Utilisation.pdf", mime="application/pdf")
+
+# ---------------------------
+# Text and Documentation
+# ---------------------------
+st.title("The Boring Stuff...")
+st.markdown("The following text describes the documentation, limitations, and formulae used in the creation of this **Mullion Check Widget**")
+st.subheader("Stress Calculations")
+st.markdown("For wind load:")
+st.latex(r'''
+    w_{WL} = q_{WL}W_{bay}
+    ''')
+st.subheader("Deflection Calculations")
+st.subheader("Load Cases")
