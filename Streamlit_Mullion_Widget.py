@@ -278,7 +278,7 @@ def generate_plots():
         )
     elif view_3d_option == "XZ Plane: Section Depth":
         camera = dict(
-            eye=dict(x=0, y=2.5, z=0),
+            eye=dict(x=0, y=-2.5, z=0),
             projection=dict(type='orthographic')
         )
     util_fig.update_layout(scene_camera=camera)
