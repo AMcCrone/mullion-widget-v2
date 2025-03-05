@@ -307,6 +307,53 @@ with col3:
     st.download_button("Download Utilisation PDF", data=pdf_util, file_name="3D_Utilisation.pdf", mime="application/pdf")
 
 # ---------------------------
+# Generate and Display Data Table
+# ---------------------------
+
+# Calculate utilisation ratios
+df_mat["ULS Utilisation"] = Z_req_cm3 / (df_mat["Wyy"] / 1000)
+df_mat["SLS Utilisation"] = np.array(defl_values) / defl_limit
+
+# Sort by max utilisation
+df_mat["Max Utilisation"] = df_mat[["ULS Utilisation", "SLS Utilisation"]].max(axis=1)
+df_sorted = df_mat.sort_values(by="Max Utilisation", ascending=False)
+
+# Define colors based on utilisation check
+def get_row_color(uls, sls):
+    if uls <= 1 and sls <= 1:
+        return "rgba(46, 204, 113, 0.8)"  # 'Emrld' color scale (greenish)
+    return "rgba(160, 160, 160, 0.6)"  # Grey out failed rows
+
+row_colors = [get_row_color(uls, sls) for uls, sls in zip(df_sorted["ULS Utilisation"], df_sorted["SLS Utilisation"])]
+
+# Create Plotly DataTable
+table_fig = go.Figure(data=[go.Table(
+    header=dict(
+        values=["Supplier", "Profile Name", "Depth (mm)", "Section Modulus (cm³)", "Second Moment of Area (cm⁴)", "ULS Utilisation", "SLS Utilisation"],
+        fill_color="rgb(0,48,60)",  # Dark Blue header
+        font=dict(color="white", size=14),
+        align="center"
+    ),
+    cells=dict(
+        values=[
+            df_sorted["Supplier"],
+            df_sorted["Profile Name"],
+            df_sorted["Depth"],
+            df_sorted["Wyy"] / 1000,  # Convert mm³ to cm³
+            df_sorted["Iyy"] / 10**4,  # Convert mm⁴ to cm⁴
+            df_sorted["ULS Utilisation"].round(2),
+            df_sorted["SLS Utilisation"].round(2),
+        ],
+        fill_color=[row_colors] * 7,  # Apply row-based coloring
+        align="center"
+    )
+)])
+
+# Display Table
+st.plotly_chart(table_fig, use_container_width=True)
+
+
+# ---------------------------
 # Text and Documentation
 # ---------------------------
 st.title("The Boring Stuff...")
@@ -341,7 +388,7 @@ st.latex(r'''
     ''')
 st.markdown("Where $\sigma_{y}$ is the yield stress of the material (aluminium or steel), $y$ is the distance of a sections' extreme fibre from its centroid, and $Z_{req}$ is the required section modulus given bending moment $M$. With:")
 st.latex(r'''
-    M = \alphaM_{WL,max} + \betaM_{BL,max}
+    M = \alpha M_{WL,max} + \beta M_{BL,max}
     ''')
 st.markdown("With combination factors $\alpha$ and $\beta$ depending on the load case")
 
@@ -366,11 +413,16 @@ st.subheader("Deflection Limits")
 st.markdown("The deflection limits are as set out in CWCT doc XX...")
 st.latex(r'''
     \delta_{lim} = \begin{cases}
-                       L/200 &\text{if } L \leq 3000mm \\
-                       5 + L/300 &\text{if } 3000 < L \leq 7500 mm \\
-                       L/250 &\text{if } L > 7500mm
+                       L/200 &\text{if } L \leq 3000 \text{mm} \\
+                       5 + L/300 &\text{if } 3000 < L \leq 7500 \text{mm} \\
+                       L/250 &\text{if } L > 7500 \text{mm}
                    \end{cases}
                    ''')
 
 st.header("Load Cases")
 st.markdown("The following load cases have selected following guidance from CWCT technical note XX:")
+
+st.header("Utilisation")
+st.markdown("Utilisation is calculated as...")
+
+st.title("Section Database")
