@@ -260,7 +260,7 @@ def generate_plots():
         marker=dict(
             size=sizes,
             color=depths_3d,
-            colorscale='RdYlGn_r',
+            colorscale='Oryel',
             colorbar=dict(title="Depth (mm)")
         ),
         text=[f"{safe_suppliers[i]}: {safe_profiles[i]}<br>Depth: {depths_3d[i]} mm<br>"
@@ -269,6 +269,7 @@ def generate_plots():
         hoverinfo='text'
     )])
     util_fig.update_layout(
+        height=650,
         title=f"3D Utilisation Plot<br>{recommended_text}",
         scene=dict(
             xaxis_title="ULS Utilisation",
@@ -305,7 +306,3 @@ with col3:
     st.plotly_chart(util_fig, height=650, use_container_width=True)
     pdf_util = get_pdf_bytes(util_fig)
     st.download_button("Download 3D PDF", data=pdf_util, file_name="3D_Utilisation.pdf", mime="application/pdf")
-
-# Optional: Merge all PDFs into one dashboard PDF.
-all_pdf_bytes = merge_pdfs([pdf_uls, pdf_sls, pdf_util])
-st.download_button("Download Full Dashboard PDF", data=all_pdf_bytes, file_name="Dashboard.pdf", mime="application/pdf")
