@@ -316,7 +316,7 @@ st.markdown("For wind load:")
 st.latex(r'''
     w_{WL} = q_{WL}W_{bay}
     ''')
-st.markdown("Where $w_{WL}$ is the effective UDL on the mullion for a given wind load, $q_{WL}$, and bay width, $W_{bay}$.)
+st.markdown("Where $w_{WL}$ is the effective UDL on the mullion for a given wind load, $q_{WL}$, and bay width, $W_{bay}$.")
 
 st.subheader("Deflection Calculations")
 st.subheader("Load Cases")
