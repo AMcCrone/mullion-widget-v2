@@ -273,8 +273,7 @@ def generate_plots():
         scene=dict(
             xaxis_title="ULS Utilisation",
             yaxis_title="SLS Utilisation",
-            zaxis_title="Section Depth (mm)",
-        height=1000
+            zaxis_title="Section Depth (mm)"
         )
     )
     if view_3d_option == "Isometric: Overview":
