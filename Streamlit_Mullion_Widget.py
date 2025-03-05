@@ -265,7 +265,7 @@ def generate_plots():
             xaxis_title="ULS Utilisation",
             yaxis_title="SLS Utilisation",
             zaxis_title="Section Depth (mm)"
-        )
+        ),
         scene=dict(
             xaxis=dict(range=[0.0, 1.0]),
             yaxis=dict(range=[0.0, 1.0])
