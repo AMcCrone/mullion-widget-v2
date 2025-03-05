@@ -316,7 +316,14 @@ st.markdown("For wind load:")
 st.latex(r'''
     w_{WL} = q_{WL}W_{bay}
     ''')
-st.markdown("Where $w_{WL}$ is the effective UDL on the mullion for a given wind load, $q_{WL}$, and bay width, $W_{bay}$.")
-
+st.markdown("Where $w_{WL}$ is the effective UDL on the mullion for a given wind load, $q_{WL}$, and bay width, $W_{bay}$. The maximum bending moment - at midspan - is calculated through:")
+st.latex(r'''
+    M_{WL,max} = \frac{w_{WL}L^2}{8}
+    ''')
+st.markdown("Where $L$ is the total span of the mullion. Finally, the required section modulus is calculated through:")
+st.latex(r'''
+    \sigma_{y} = \frac{M_{WL,max}y}{I} = \frac{M_{WL,max}}{Z_{req}}
+    ''')
+st.markdown("Where $\sigma_{y}$ is the yield stress of the material (Aluminium or Steel), $y$ is the distance of a sections' extreme fibre from its centroid, and $Z_{req}$ is the required section modulus given $M_{WL,max}$")
 st.subheader("Deflection Calculations")
 st.subheader("Load Cases")
