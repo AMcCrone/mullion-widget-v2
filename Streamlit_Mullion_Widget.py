@@ -284,10 +284,10 @@ def generate_plots():
         )
     util_fig.update_layout(scene_camera=camera)
 
-    return uls_fig, sls_fig, util_fig
+    return uls_fig, sls_fig, util_fig, defl_values, Z_req_cm3, defl_limit
 
 # Generate the Plotly figures.
-uls_fig, sls_fig, util_fig = generate_plots()
+uls_fig, sls_fig, util_fig, defl_values, Z_req_cm3, defl_limit = generate_plots()
 
 # ---------------------------
 # Layout: Arrange all three graphs on one line.
