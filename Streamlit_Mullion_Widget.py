@@ -4,15 +4,13 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 
-# Helper: convert color tuple (0–1 floats) to an RGB string.
-def to_rgb(color_tuple):
-    r, g, b = [int(255 * c) for c in color_tuple]
-    return f'rgb({r},{g},{b})'
-
 # Define a few key colours.
-TT_LightBlue = to_rgb((0.53333, 0.85882, 0.87451))
-TT_MidBlue   = to_rgb((0, 0.63922, 0.67843))
-TT_Orange    = to_rgb((0.82745, 0.27059, 0.11373))
+TT_Orange = (211,69,29)
+TT_Olive = (139,144,100)
+TT_LightBlue = (136,219,223)
+TT_MidBlue = (0,163,173)
+TT_DarkBlue = (0,48,60)
+TT_Grey = (99,102,105)
 
 # ---------------------------
 # Streamlit Page Setup
@@ -225,9 +223,9 @@ def generate_plots():
             safe_profiles.append(profiles[i])
     if len(uls_util) > 0:
         d_arr = np.sqrt(np.array(uls_util)**2 + np.array(sls_util)**2)
-        sizes = 20 + (d_arr / np.sqrt(2)) * 480
+        sizes = 1 + (d_arr / np.sqrt(2)) * 9
     else:
-        sizes = 500
+        sizes = 10
 
     recommended_text = "No suitable profile - choose a custom one!"
     if len(depths_3d) > 0:
