@@ -339,16 +339,24 @@ row_colors = []
 for _, row in df_sorted.iterrows():
     # If both utilisation checks pass (<= 1), mark as blue; otherwise, grey.
     if (row["ULS Utilisation"] <= 1) and (row["SLS Utilisation"] <= 1):
-        row_colors.append("#88DBDF")  # blue for passing sections
+        row_colors.append("#E7F8F9")  # blue for passing sections
     else:
         row_colors.append("#DFE0E1")  # grey for failing sections
+
+text_colors = []
+for _, row in df_sorted.iterrows():
+    # If both utilisation checks pass, use white text; otherwise use #636669.
+    if (row["ULS Utilisation"] <= 1) and (row["SLS Utilisation"] <= 1):
+        text_colors.append("#00303C")
+    else:
+        text_colors.append("#636669")
 
 # Create the Plotly Table.
 table_fig = go.Figure(data=[go.Table(
     header=dict(
         values=["Supplier", "Profile Name", "Depth (mm)", "Section Modulus (cm³)", "Second Moment of Area (cm⁴)", "ULS Utilisation", "SLS Utilisation"],
         fill_color=TT_DarkBlue,
-        font=dict(color="white", size=24),
+        font=dict(color="white", size=18),
         align="center"
     ),
     cells=dict(
@@ -362,7 +370,7 @@ table_fig = go.Figure(data=[go.Table(
             df_sorted["SLS Utilisation"].round(2)
         ],
         fill_color=[row_colors] * 7,  # assign the computed row colors to all columns
-        font=dict(size=14), 
+        font=dict(color=[text_colors] * 7, size=14), 
         align="center"
     )
 )])
@@ -420,11 +428,11 @@ st.markdown("Where $E$ is the elastic modulus of the material (aluminium or stee
 st.subheader("Barrier Load (WL)")
 st.markdown("For the point load $P_{BL}$ at barrier height $L_{BL}$, the deflection, $\delta_{BL}$, is calculated through:")
 st.latex(r'''
-    \delta_{BL}=\frac{P_{BL}}{12EI}*\left(L^2-x^2-L_{BL}^2\right)
+    \delta_{BL}=\frac{P_{BL}}{12EI}\left(L^2-x^2-L_{BL}^2\right)
     ''')
 st.markdown("Where $L_{BL}$ has been assumed to be 1100mm from the base of the mullion and the deflection taken at midspan ($x = L/2$) for superposition with $\delta_{WL}$. Thus:")
 st.latex(r'''
-    \delta_{BL}=\frac{P_{BL}}{12EI}*\left(\frac{3}{4}L^2-L_{BL}^2\right)
+    \delta_{BL}=\frac{P_{BL}}{12EI}\left(\frac{3}{4}L^2-L_{BL}^2\right)
     ''')
 st.subheader("Deflection Limits")
 st.markdown("The deflection limits are as set out in CWCT doc XX...")
