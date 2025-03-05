@@ -320,11 +320,7 @@ st.markdown("Where $w_{WL}$ is the effective UDL on the mullion for a given wind
 st.latex(r'''
     M_{WL,max} = \frac{w_{WL}L^2}{8}
     ''')
-st.markdown("Where $L$ is the total span of the mullion. Finally, the required section modulus is calculated through:")
-st.latex(r'''
-    \sigma_{y} = \frac{M_{WL,max}y}{I} = \frac{M_{WL,max}}{Z_{req}}
-    ''')
-st.markdown("Where $\sigma_{y}$ is the yield stress of the material (aluminium or steel), $y$ is the distance of a sections' extreme fibre from its centroid, and $Z_{req}$ is the required section modulus given $M_{WL,max}$")
+st.markdown("Where $L$ is the total span of the mullion.")
 
 st.subheader("Barrier Load (WL)")
 st.latex(r'''
@@ -334,11 +330,20 @@ st.markdown("Where $P_{BL}$ is the effective point load on the mullion at 1100mm
 st.latex(r'''
     M_{BL,max} = \frac{P_{BL}L}{2}
     ''')
-st.markdown("Similarly to wind load, the required section modulus is calculated through:")
+
+st.subheader("Stress Limit")
+st.markdown("The required section modulus is calculated through:")
 st.latex(r'''
-    \sigma_{y} = \frac{M_{BL,max}}{Z_{req}}
+    \sigma_{y} = \frac{My}{I} = \frac{M}{Z_{req}} 
     ''')
-st.markdown("")
+st.latex(r'''
+    Z_{req} = \frac{M}{\sigma_{y}} 
+    ''')
+st.markdown("Where $\sigma_{y}$ is the yield stress of the material (aluminium or steel), $y$ is the distance of a sections' extreme fibre from its centroid, and $Z_{req}$ is the required section modulus given bending moment $M$. With:")
+st.latex(r'''
+    M = \alphaM_{WL,max} + \betaM_{BL,max}
+    ''')
+st.markdown("With combination factors $\alpha$ and $\beta$ depending on the load case")
 
 st.header("Deflection Calculations")
 st.subheader("Wind Load (WL)")
@@ -357,8 +362,15 @@ st.markdown("Where $L_{BL}$ has been assumed to be 1100mm from the base of the m
 st.latex(r'''
     \delta_{BL}=\frac{P_{BL}}{12EI}*\left(\frac{3}{4}L^2-L_{BL}^2\right)
     ''')
+st.subheader("Deflection Limits")
+st.markdown("The deflection limits are as set out in CWCT doc XX...")
+st.latex(r'''
+    \delta_{lim} = \begin{cases}
+                       L/200 &\text{if } L \leq 3000mm \\
+                       5 + L/300 &\text{if } 3000 < L \leq 7500 mm \\
+                       L/250 &\text{if } L > 7500mm
+                   \end{cases}
+                   ''')
 
 st.header("Load Cases")
 st.markdown("The following load cases have selected following guidance from CWCT technical note XX:")
-
-st.header("Deflection Limits")
