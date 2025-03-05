@@ -5,12 +5,12 @@ import pandas as pd
 import plotly.graph_objects as go
 
 # Define a few key colours.
-TT_Orange = (211,69,29)
-TT_Olive = (139,144,100)
-TT_LightBlue = (136,219,223)
-TT_MidBlue = (0,163,173)
-TT_DarkBlue = (0,48,60)
-TT_Grey = (99,102,105)
+TT_Orange = "rgb(211,69,29)"
+TT_Olive = "rgb(139,144,100)"
+TT_LightBlue = "rgb(136,219,223)"
+TT_MidBlue = "rgb(0,163,173)"
+TT_DarkBlue = "rgb(0,48,60)"
+TT_Grey = "rgb(99,102,105)"
 
 # ---------------------------
 # Streamlit Page Setup
