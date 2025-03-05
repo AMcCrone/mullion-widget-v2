@@ -311,8 +311,8 @@ with col3:
 # ---------------------------
 st.title("The Boring Stuff...")
 st.markdown("The following text describes the documentation, limitations, and formulae used in the creation of this **Mullion Check Widget**")
-st.subheader("Stress Calculations")
-st.markdown("For wind load:")
+st.header("Stress Calculations")
+st.subheader("Wind Load (WL)")
 st.latex(r'''
     w_{WL} = q_{WL}W_{bay}
     ''')
@@ -324,6 +324,41 @@ st.markdown("Where $L$ is the total span of the mullion. Finally, the required s
 st.latex(r'''
     \sigma_{y} = \frac{M_{WL,max}y}{I} = \frac{M_{WL,max}}{Z_{req}}
     ''')
-st.markdown("Where $\sigma_{y}$ is the yield stress of the material (Aluminium or Steel), $y$ is the distance of a sections' extreme fibre from its centroid, and $Z_{req}$ is the required section modulus given $M_{WL,max}$")
-st.subheader("Deflection Calculations")
-st.subheader("Load Cases")
+st.markdown("Where $\sigma_{y}$ is the yield stress of the material (aluminium or steel), $y$ is the distance of a sections' extreme fibre from its centroid, and $Z_{req}$ is the required section modulus given $M_{WL,max}$")
+
+st.subheader("Barrier Load (WL)")
+st.latex(r'''
+    P_{BL} = w_{WL}W_{bay}
+    ''')
+st.markdown("Where $P_{BL}$ is the effective point load on the mullion at 1100mm from its base for a given barrier load, $w_{BL}$, and bay width, $W_{bay}$. The maximum bending moment - at midspan - is calculated through:")
+st.latex(r'''
+    M_{BL,max} = \frac{P_{BL}L}{2}
+    ''')
+st.markdown("Similarly to wind load, the required section modulus is calculated through:")
+st.latex(r'''
+    \sigma_{y} = \frac{M_{BL,max}}{Z_{req}}
+    ''')
+st.markdown("")
+
+st.header("Deflection Calculations")
+st.subheader("Wind Load (WL)")
+st.markdown("For the UDL $w_{WL}$, the maximum deflection, $\delta_{WL}$, is at midspan with a magnitude of:")
+st.latex(r'''
+    \delta_{WL}=\frac{5w_{WL}L^4}{384EI}
+    ''')
+st.markdown("Where $E$ is the elastic modulus of the material (aluminium or steel) and $I$ is the section's second moment of area.")
+
+st.subheader("Barrier Load (WL)")
+st.markdown("For the point load $P_{BL}$ at barrier height $L_{BL}$, the deflection, $\delta_{BL}$, is calculated through:")
+st.latex(r'''
+    \delta_{BL}=\frac{P_{BL}}{12EI}*\left(L^2-x^2-L_{BL}^2\right)
+    ''')
+st.markdown("Where $L_{BL}$ has been assumed to be 1100mm from the base of the mullion and the deflection taken at midspan ($x = \frac{L}{2}$) for superposition with $\delta_{WL}$. Thus:")
+st.latex(r'''
+    \delta_{BL}=\frac{P_{BL}}{12EI}*\left(\frac{3}{4}L^2-L_{BL}^2\right)
+    ''')
+
+st.header("Load Cases")
+st.markdown("The following load cases have selected following guidance from CWCT technical note XX:")
+
+st.header("Deflection Limits")
