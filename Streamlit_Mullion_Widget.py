@@ -264,6 +264,7 @@ def generate_plots():
         scene=dict(
             xaxis=dict(range=[0.0, 1.0]),
             yaxis=dict(range=[0.0, 1.0]),
+            zaxis=dict(range=[50, max(depths_3d)]),
             xaxis_title="ULS Utilisation",
             yaxis_title="SLS Utilisation",
             zaxis_title="Section Depth (mm)"
