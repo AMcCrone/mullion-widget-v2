@@ -47,7 +47,6 @@ material_props = {
 
 suppliers_all = sorted(df_selected["Supplier"].unique())
 selected_suppliers = st.sidebar.multiselect("Select Suppliers", options=suppliers_all, default=suppliers_all)
-show_data_labels = st.sidebar.checkbox("Show Data Labels", value=False)
 barrier_load_option = st.sidebar.radio("Barrier Load (kN/m)", options=["None", "0.74", "1.5", "3"], index=0)
 selected_barrier_load = 0 if barrier_load_option == "None" else float(barrier_load_option)
 ULS_case = st.sidebar.radio("ULS Load Case", options=[
@@ -170,8 +169,10 @@ def generate_plots():
         xaxis_title="Section Depth (mm)",
         yaxis_title="Section Modulus (cm³)",
         xaxis=dict(range=[x_min, x_max]),
-        yaxis=dict(range=[0, uls_ymax])
+        yaxis=dict(range=[0, uls_ymax]),
+        height=500
     )
+
 
     # ----- SLS Plot -----
     E = material_props[plot_material]["E"]
@@ -218,7 +219,8 @@ def generate_plots():
         xaxis_title="Section Depth (mm)",
         yaxis_title="Deflection (mm)",
         xaxis=dict(range=[x_min, x_max]),
-        yaxis=dict(range=[0, sls_ymax])
+        yaxis=dict(range=[0, sls_ymax]),
+        height=500
     )
 
     # ----- 3D Utilisation Plot -----
@@ -271,7 +273,8 @@ def generate_plots():
         scene=dict(
             xaxis_title="ULS Utilisation",
             yaxis_title="SLS Utilisation",
-            zaxis_title="Section Depth (mm)"
+            zaxis_title="Section Depth (mm)",
+        height=1000
         )
     )
     if view_3d_option == "Isometric: Overview":
