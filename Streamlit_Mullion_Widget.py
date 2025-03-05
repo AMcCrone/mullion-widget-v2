@@ -338,7 +338,11 @@ df_sorted = df_mat.sort_values(by="Max Utilisation", ascending=True)
 
 # Create a helper function to pick a color from the Emrld colorscale based on depth.
 def get_emrld_color(depth, min_depth, max_depth):
-    scale = px.colors.sequential.Emrld
+    try:
+        scale = px.colors.sequential.Emrld
+    except AttributeError:
+        # Fallback colorscale (a green palette)
+        scale = ['#006400', '#228B22', '#32CD32', '#7CFC00', '#ADFF2F']
     if max_depth == min_depth:
         return scale[len(scale)//2]
     norm = (depth - min_depth) / (max_depth - min_depth)
