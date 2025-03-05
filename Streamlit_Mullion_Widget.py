@@ -309,6 +309,7 @@ with col3:
 # -----------------------------------------------------------------------------
 # Append Table of Profiles Sorted by Utilisation (No Conditional Colors)
 # -----------------------------------------------------------------------------
+st.title("Section Database")
 
 # Compute utilisation ratios for each profile in df_mat.
 df_mat = df_selected[(df_selected["Material"] == plot_material) & 
@@ -354,7 +355,7 @@ for _, row in df_sorted.iterrows():
 # Create the Plotly Table.
 table_fig = go.Figure(data=[go.Table(
     header=dict(
-        values=["Supplier", "Profile Name", "Depth (mm)", "Section Modulus (cm³)", "Second Moment of Area (cm⁴)", "ULS Utilisation", "SLS Utilisation"],
+        values=["Supplier", "Profile Name", "Depth (mm)", "Section Modulus (cm³)", "I (cm⁴)", "ULS Util. (%)", "SLS Util. (%)"],
         fill_color=TT_DarkBlue,
         font=dict(color="white", size=18),
         align="center"
@@ -366,8 +367,8 @@ table_fig = go.Figure(data=[go.Table(
             df_sorted["Depth"],
             (df_sorted["Wyy"] / 1000).round(2),
             (df_sorted["Iyy"] / 10000).round(2),
-            df_sorted["ULS Utilisation"].round(2),
-            df_sorted["SLS Utilisation"].round(2)
+            (df_sorted["ULS Utilisation"] * 100).round(1).astype(str) + '%',  # ULS Utilisation as percentage
+            (df_sorted["SLS Utilisation"] * 100).round(1).astype(str) + '%'   # SLS Utilisation as percentage
         ],
         fill_color=[row_colors] * 7,  # assign the computed row colors to all columns
         font=dict(color=[text_colors] * 7, size=14), 
@@ -449,5 +450,3 @@ st.markdown("The following load cases have selected following guidance from CWCT
 
 st.header("Utilisation")
 st.markdown("Utilisation is calculated as...")
-
-st.title("Section Database")
