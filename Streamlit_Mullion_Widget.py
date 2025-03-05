@@ -408,7 +408,7 @@ st.markdown("Where $\sigma_{y}$ is the yield stress of the material (aluminium o
 st.latex(r'''
     M = \alpha M_{WL,max} + \beta M_{BL,max}
     ''')
-st.markdown("With combination factors r"$\alpha$" and r"$\beta$" depending on the load case")
+st.markdown("With combination factors α and β depending on the load case")
 
 st.header("Deflection Calculations")
 st.subheader("Wind Load (WL)")
