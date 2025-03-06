@@ -6,26 +6,21 @@ import plotly.graph_objects as go
 import io
 from PyPDF2 import PdfMerger  # for merging PDFs
 
-# Define a TT colours.
-TT_Orange = "rgb(211,69,29)"
-TT_Olive = "rgb(139,144,100)"
-TT_LightBlue = "rgb(136,219,223)"
-TT_MidBlue = "rgb(0,163,173)"
-TT_DarkBlue = "rgb(0,48,60)"
-TT_Grey = "rgb(99,102,105)"
+# Retrieve the password from secrets
+PASSWORD = st.secrets["password"]
 
-# Initialize authentication state in session_state
+# Initialize authentication state
 if "authenticated" not in st.session_state:
     st.session_state["authenticated"] = False
 
 def check_password():
-    """Checks whether a password entered by the user is correct."""
-    if st.session_state.get("password_input") == "ttfe":
+    """Check the password input against the secret password."""
+    if st.session_state.get("password_input") == PASSWORD:
         st.session_state["authenticated"] = True
     else:
-        st.error("Incorrect password. Please try again.")
+        st.error("Incorrect password. Do you not know your TT colours...? ;)")
 
-# If the user is not authenticated, show a password input
+# If the user is not authenticated, show the password input and halt the app.
 if not st.session_state["authenticated"]:
     st.text_input("Enter Password:", type="password", key="password_input", on_change=check_password)
     st.stop()
