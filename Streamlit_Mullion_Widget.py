@@ -457,6 +457,12 @@ st.latex(r'''
                    ''')
 
 st.header("Load Cases")
-st.markdown("The following load cases have selected following guidance from CWCT technical note XX:")
+st.markdown("The following load cases have selected following guidance from *CWCT Guidance on non-loadbearing building envelopes*")
+st.latex(r'''
+    \text{Load Case 1:} 1.35DL + 1.5WL + 0.5*1.5BL
+    \text{Load Case 2:} 1.35DL + 0.5*1.5WL + 1.5BL
+    \text{Load Case 3:} 1.35DL + 1.5WL
+    \text{Load Case 4:} 1.35DL + 1.5BL
+                   ''')
 st.header("Utilisation")
 st.markdown("Utilisation is calculated as...")
