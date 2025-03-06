@@ -393,7 +393,7 @@ st.latex(r'''
     ''')
 st.markdown("Where $P_{BL}$ is the effective point load on the mullion at 1100mm from its base for a given barrier load, $w_{BL}$, and bay width, $W_{bay}$. The maximum bending moment - at midspan - is calculated through:")
 st.latex(r'''
-    M_{BL,max} = \frac{P_{BL}L}{2}
+    M_{BL,max} = \frac{P_{BL}Lx}{2} = \frac{P_{BL}L^2}{4}
     ''')
 
 st.subheader("Stress Limit")
