@@ -37,7 +37,7 @@ if not st.session_state["authenticated"]:
 # Streamlit Page Setup
 # ---------------------------
 st.set_page_config(page_title="Section Design Tool", layout="wide")
-st.title("Mullion Design Widget")
+st.title("Mullion Design Widget - *Beta Version*")
 
 # ---------------------------
 # Sidebar Controls
