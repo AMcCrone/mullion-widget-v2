@@ -14,6 +14,22 @@ TT_MidBlue = "rgb(0,163,173)"
 TT_DarkBlue = "rgb(0,48,60)"
 TT_Grey = "rgb(99,102,105)"
 
+# Initialize authentication state in session_state
+if "authenticated" not in st.session_state:
+    st.session_state["authenticated"] = False
+
+def check_password():
+    """Checks whether a password entered by the user is correct."""
+    if st.session_state.get("password_input") == "ttfe":
+        st.session_state["authenticated"] = True
+    else:
+        st.error("Incorrect password. Please try again.")
+
+# If the user is not authenticated, show a password input
+if not st.session_state["authenticated"]:
+    st.text_input("Enter Password:", type="password", key="password_input", on_change=check_password)
+    st.stop()
+
 # ---------------------------
 # Streamlit Page Setup
 # ---------------------------
