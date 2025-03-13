@@ -26,7 +26,7 @@ def check_password():
     if st.session_state.get("password_input") == PASSWORD:
         st.session_state["authenticated"] = True
     else:
-        st.error("Incorrect password. Do you not know your TT colours...? ;)")
+        st.error("Incorrect password.")
 
 # If the user is not authenticated, show the password input and halt the app.
 if not st.session_state["authenticated"]:
@@ -82,7 +82,7 @@ view_3d_option = st.sidebar.radio("3D View", options=[
     "XZ Plane: Section Depth"
 ], index=0)
 wind_pressure = st.sidebar.slider("Wind Pressure (kPa)", 0.1, 5.0, 1.0, 0.1)
-bay_width = st.sidebar.slider("Bay Width (mm)", 2000, 10000, 3000, 500)
+bay_width = st.sidebar.slider("Bay Width (mm)", 500, 10000, 3000, 250)
 mullion_length = st.sidebar.slider("Mullion Length (mm)", 2500, 12000, 4000, 250)
 barrier_L = 1100  # constant barrier length (mm)
 
