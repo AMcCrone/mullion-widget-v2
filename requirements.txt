@@ -4,4 +4,4 @@ numpy
 plotly
 openpyxl
 kaleido
-PyPDF2
+reportlab
