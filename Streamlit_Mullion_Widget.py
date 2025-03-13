@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import io
-from PyPDF2 import PdfMerger  # for merging PDFs
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
