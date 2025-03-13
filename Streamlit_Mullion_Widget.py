@@ -13,6 +13,7 @@ TT_LightBlue = "rgb(136,219,223)"
 TT_MidBlue = "rgb(0,163,173)"
 TT_DarkBlue = "rgb(0,48,60)"
 TT_Grey = "rgb(99,102,105)"
+TT_Purple = "rgb(128,0,128)"  # Added for custom section
 
 # Retrieve the password from secrets
 PASSWORD = st.secrets["password"]
@@ -87,6 +88,21 @@ mullion_length = st.sidebar.slider("Mullion Length (mm)", 2500, 12000, 4000, 250
 barrier_L = 1100  # constant barrier length (mm)
 
 # ---------------------------
+# Custom Section Controls
+# ---------------------------
+st.sidebar.header("Custom Section")
+use_custom_section = st.sidebar.checkbox("Add Custom Section?", value=False)
+
+if use_custom_section:
+    custom_section_name = st.sidebar.text_input("Section Name", value="Custom Section")
+    custom_section_material = plot_material  # Use the same material as selected above
+    custom_section_depth = st.sidebar.number_input("Section Depth (mm)", min_value=50, max_value=500, value=150)
+    custom_section_z = st.sidebar.number_input("Section Modulus (cm³)", min_value=1.0, max_value=1000.0, value=50.0)
+    custom_section_i = st.sidebar.number_input("Moment of Inertia (cm⁴)", min_value=1.0, max_value=10000.0, value=500.0)
+    custom_section_supplier = "Custom"
+    custom_section_reinforced = st.sidebar.checkbox("Reinforced?", value=False)
+
+# ---------------------------
 # Helper Functions for PDF Export
 # ---------------------------
 def get_pdf_bytes(fig):
@@ -135,17 +151,35 @@ def generate_plots():
         st.error("No sections selected.")
         st.stop()
 
-    depths   = df_mat["Depth"].values        # mm
-    Wyy_vals = df_mat["Wyy"].values           # mm³
-    Iyy_vals = df_mat["Iyy"].values           # mm⁴
+    depths = df_mat["Depth"].values        # mm
+    Wyy_vals = df_mat["Wyy"].values        # mm³
+    Iyy_vals = df_mat["Iyy"].values        # mm⁴
     profiles = df_mat["Profile Name"].values
-    reinf    = df_mat["Reinf"].values
-    supps    = df_mat["Supplier"].values
-    available_cm3 = Wyy_vals / 1000           # cm³
+    reinf = df_mat["Reinf"].values
+    supps = df_mat["Supplier"].values
+    available_cm3 = Wyy_vals / 1000        # cm³
+    
+    # Add custom section if enabled
+    if use_custom_section:
+        depths = np.append(depths, custom_section_depth)
+        Wyy_vals = np.append(Wyy_vals, custom_section_z * 1000)  # Convert back to mm³
+        Iyy_vals = np.append(Iyy_vals, custom_section_i * 10000)  # Convert back to mm⁴
+        profiles = np.append(profiles, custom_section_name)
+        reinf = np.append(reinf, custom_section_reinforced)
+        supps = np.append(supps, custom_section_supplier)
+        available_cm3 = np.append(available_cm3, custom_section_z)
 
     # ----- ULS Plot -----
     uls_passed = available_cm3 >= Z_req_cm3
-    uls_colors = ['seagreen' if passed else 'darkred' for passed in uls_passed]
+    
+    # Set colors with custom section in purple
+    uls_colors = []
+    for i, passed in enumerate(uls_passed):
+        if i == len(uls_passed) - 1 and use_custom_section:
+            uls_colors.append(TT_Purple if passed else 'darkred')
+        else:
+            uls_colors.append('seagreen' if passed else 'darkred')
+            
     uls_symbols = ['square' if r else 'circle' for r in reinf]
     uls_hover = [
         f"{profiles[i]}<br>Supplier: {supps[i]}<br>Depth: {depths[i]} mm<br>Z: {available_cm3[i]:.2f} cm³<br>ULS: {'Pass' if uls_passed[i] else 'Fail'}"
@@ -183,7 +217,6 @@ def generate_plots():
         height=650
     )
 
-
     # ----- SLS Plot -----
     E = material_props[plot_material]["E"]
     defl_values = []
@@ -200,6 +233,15 @@ def generate_plots():
         )
     sls_ymax = 1.33 * defl_limit
     valid = np.where(uls_passed)[0]
+    
+    # Set colors with custom section in purple
+    sls_colors = []
+    for i in valid:
+        if i == len(uls_passed) - 1 and use_custom_section:
+            sls_colors.append(TT_Purple if defl_values[i] <= defl_limit else 'darkred')
+        else:
+            sls_colors.append('seagreen' if defl_values[i] <= defl_limit else 'darkred')
+            
     sls_fig = go.Figure()
     sls_fig.add_shape(type="rect",
                       x0=x_min, x1=x_max,
@@ -214,8 +256,8 @@ def generate_plots():
         y=np.array(defl_values)[valid],
         mode='markers',
         marker=dict(
-            color=['seagreen' if np.array(defl_values)[i] <= defl_limit else 'darkred' for i in valid],
-            symbol=[ 'square' if reinf[i] else 'circle' for i in valid],
+            color=sls_colors,
+            symbol=[uls_symbols[i] for i in valid],
             size=15,
             line=dict(color='black', width=1)
         ),
@@ -247,6 +289,15 @@ def generate_plots():
             depths_3d.append(depths[i])
             safe_suppliers.append(supps[i])
             safe_profiles.append(profiles[i])
+    
+    # Create color array for 3D plot
+    colors_3d = []
+    for i in range(len(safe_suppliers)):
+        if safe_suppliers[i] == "Custom" and use_custom_section:
+            colors_3d.append(TT_Purple)
+        else:
+            colors_3d.append('#1f77b4')  # Default blue color
+            
     if len(uls_util) > 0:
         d_arr = np.sqrt(np.array(uls_util)**2 + np.array(sls_util)**2)
         sizes = 10 + (d_arr / np.sqrt(2)) * 20
@@ -269,9 +320,9 @@ def generate_plots():
         mode='markers',
         marker=dict(
             size=sizes,
-            color=depths_3d,
-            colorscale='Emrld',
-            colorbar=dict(title="Depth (mm)")
+            color=colors_3d if use_custom_section else depths_3d,
+            colorscale='Emrld' if not use_custom_section else None,
+            colorbar=dict(title="Depth (mm)") if not use_custom_section else None
         ),
         text=[f"{safe_suppliers[i]}: {safe_profiles[i]}<br>Depth: {depths_3d[i]} mm<br>"
               f"ULS Util: {uls_util[i]:.2f}<br>SLS Util: {sls_util[i]:.2f}"
@@ -284,7 +335,7 @@ def generate_plots():
         scene=dict(
             xaxis=dict(range=[0.0, 1.0]),
             yaxis=dict(range=[0.0, 1.0]),
-            zaxis=dict(range=[50, 1.05 * max(depths)]),
+            zaxis=dict(range=[50, 1.05 * max(depths)]) if len(depths) > 0 else dict(range=[50, 500]),
             xaxis_title="ULS Utilisation",
             yaxis_title="SLS Utilisation",
             zaxis_title="Section Depth (mm)"
@@ -327,7 +378,7 @@ with col3:
     st.download_button("Download Utilisation PDF", data=pdf_util, file_name="3D_Utilisation.pdf", mime="application/pdf")
 
 # -----------------------------------------------------------------------------
-# Append Table of Profiles Sorted by Utilisation (No Conditional Colors)
+# Append Table of Profiles Sorted by Utilisation (Using Pandas DataFrame)
 # -----------------------------------------------------------------------------
 st.title("Section Database")
 
@@ -336,10 +387,23 @@ df_mat = df_selected[(df_selected["Material"] == plot_material) &
                      (df_selected["Supplier"].isin(selected_suppliers))].copy()
 df_mat.reset_index(drop=True, inplace=True)
 
+# Add custom section to dataframe if enabled
+if use_custom_section:
+    custom_row = pd.DataFrame({
+        "Supplier": [custom_section_supplier],
+        "Profile Name": [custom_section_name],
+        "Material": [plot_material],
+        "Reinf": [custom_section_reinforced],
+        "Depth": [custom_section_depth],
+        "Iyy": [custom_section_i * 10000],  # Convert cm⁴ to mm⁴
+        "Wyy": [custom_section_z * 1000]    # Convert cm³ to mm³
+    })
+    df_mat = pd.concat([df_mat, custom_row], ignore_index=True)
+
 # Calculate ULS utilisation based on the available section modulus (converted to cm³)
 df_mat["ULS Utilisation"] = Z_req_cm3 / (df_mat["Wyy"] / 1000)
 
-# Recompute deflection for each row (using the same approach as in generate_plots)
+# Recompute deflection for each row
 E = material_props[plot_material]["E"]
 defl_values_table = []
 for i, row in df_mat.iterrows():
@@ -353,43 +417,32 @@ df_mat["SLS Utilisation"] = np.array(defl_values_table) / defl_limit
 
 # Create a 'Max Utilisation' for sorting purposes
 df_mat["Max Utilisation"] = df_mat[["ULS Utilisation", "SLS Utilisation"]].max(axis=1)
+
 # Sort profiles so that the best-performing (lowest utilisation) are at the top.
 df_sorted = df_mat.sort_values(by="Max Utilisation", ascending=True)
 
-row_colors = []
-for _, row in df_sorted.iterrows():
-    # If both utilisation checks pass (<= 1), mark as blue; otherwise, grey.
-    if (row["ULS Utilisation"] <= 1) and (row["SLS Utilisation"] <= 1):
-        row_colors.append("#E7F8F9")  # blue for passing sections
+# Create a Pandas DataFrame for display
+df_display = df_sorted.copy()
+
+# Format the dataframe for display
+df_display["Section Modulus (cm³)"] = (df_display["Wyy"] / 1000).round(2)
+df_display["I (cm⁴)"] = (df_display["Iyy"] / 10000).round(2)
+df_display["ULS Util. (%)"] = (df_display["ULS Utilisation"] * 100).round(1)
+df_display["SLS Util. (%)"] = (df_display["SLS Utilisation"] * 100).round(1)
+
+# Display only the columns we want
+display_columns = ["Supplier", "Profile Name", "Depth", "Section Modulus (cm³)", "I (cm⁴)", "ULS Util. (%)", "SLS Util. (%)"]
+df_display = df_display[display_columns]
+
+# Create a function to apply color highlighting
+def highlight_sections(row):
+    if row["ULS Util. (%)"] <= 100 and row["SLS Util. (%)"] <= 100:
+        return ['background-color: #E7F8F9'] * len(row)  # Light blue for passing
     else:
-        row_colors.append("#DFE0E1")  # grey for failing sections
+        return ['background-color: #DFE0E1'] * len(row)  # Gray for failing
 
-# Create the Plotly Table.
-table_fig = go.Figure(data=[go.Table(
-    header=dict(
-        values=["Supplier", "Profile Name", "Depth (mm)", "Section Modulus (cm³)", "I (cm⁴)", "ULS Util. (%)", "SLS Util. (%)"],
-        fill_color=TT_DarkBlue,
-        font=dict(color="white", size=18),
-        align="center"
-    ),
-    cells=dict(
-        values=[
-            df_sorted["Supplier"],
-            df_sorted["Profile Name"],
-            df_sorted["Depth"],
-            (df_sorted["Wyy"] / 1000).round(2),
-            (df_sorted["Iyy"] / 10000).round(2),
-            (df_sorted["ULS Utilisation"] * 100).round(1).astype(str) + '%',  # ULS Utilisation as percentage
-            (df_sorted["SLS Utilisation"] * 100).round(1).astype(str) + '%'   # SLS Utilisation as percentage
-        ],
-        fill_color=[row_colors] * 7,  # assign the computed row colors to all columns
-        font=dict(size=14), 
-        align="center"
-    )
-)])
-
-st.plotly_chart(table_fig, use_container_width=True)
-
+# Apply the highlighting and display the dataframe
+st.dataframe(df_display.style.apply(highlight_sections, axis=1), height=400)
 
 # ---------------------------
 # Text and Documentation
