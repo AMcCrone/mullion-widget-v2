@@ -39,7 +39,7 @@ if not st.session_state["authenticated"]:
 # ---------------------------
 st.set_page_config(page_title="Section Design Tool", layout="wide")
 st.title("Mullion Design Widget - *Beta Version*")
-st.markdown("Time to find that one in a mullion...")
+st.markdown("Find your one in a mullion ❤️")
 
 # ---------------------------
 # Sidebar Controls
